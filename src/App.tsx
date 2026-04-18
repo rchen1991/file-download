@@ -1,120 +1,97 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState, useEffect, useRef } from 'react'
+import TableRow from './components/TableRow'
 import './App.css'
 
+import { capitalizeFirstLetter } from './utils/capitalizeFirstLetter'
+
+import DATA from './constants/data'
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const selectAllRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const selectAllInput = selectAllRef.current;
+    if (!selectAllInput) return;
+
+    if (selected.size > 0 && selected.size < DATA.length) {
+      selectAllInput.indeterminate = true;
+      selectAllInput.checked = false;
+    } else if (selected.size === DATA.length) {
+      selectAllInput.indeterminate = false;
+      selectAllInput.checked = true;
+    } else {
+      selectAllInput.indeterminate = false;
+      selectAllInput.checked = false;
+    }
+
+  }, [selected])
+
+  const handleSelected = (selectedRow: number) => {
+    console.log(selectedRow)
+
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(selectedRow)) {
+        next.delete(selectedRow)
+      } else {
+        next.add(selectedRow)
+      }
+
+      return next;
+    })
+  }
+
+  const handleSelectAll = () => {
+
+    if (selected.size === DATA.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(DATA.map((_,i) => i)))
+    }
+  }
+
+  const headerNames = Object.keys(DATA[0])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div>
+      <div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+          <input type="checkbox" ref={selectAllRef} onClick={handleSelectAll}/>
+          <span>{selected.size > 0 ? `Selected ${selected.size}` : 'None Selected'}</span>
         </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <button>Download Selected</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            {headerNames.map((header) => {
+              return (
+                <th>
+                  {capitalizeFirstLetter(header)}
+                </th>
+              )
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {DATA.map((rowData, index) => {
+            return (
+              <TableRow
+                name={rowData.name ?? ""}
+                device={rowData.device ?? ""}
+                path={rowData.path ?? ""}
+                status={rowData.status ?? ""}
+                index={index}
+                isSelected={selected.has(index)}
+                onSelect={handleSelected}
+              />
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
