@@ -1,3 +1,5 @@
+import Icon from './Icon'
+
 import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter"
 
 import '../styles/TableRow.css'
@@ -53,8 +55,12 @@ export default function TableRow({
       <td>
         {path}
       </td>
-      <td>
-        {status === "available" ? (<span>*</span>) : null}
+      <td className="table-row__status">
+        {status === "available" ? (
+          <span className="table-row__status-icon" >
+            <Icon token="green-circle"/>
+          </span>
+        ) : null}
         {capitalizeFirstLetter(status ?? "")}
       </td>
     </tr>

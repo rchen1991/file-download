@@ -18,3 +18,13 @@
     height: 16px;
     width: 16px;
 }
+
+.table-row__status {
+    position: relative;
+    text-align: left;
+}
+
+.table-row__status-icon {
+    position: absolute;
+    left: -30px;
+}

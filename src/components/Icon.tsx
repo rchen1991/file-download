@@ -1,4 +1,5 @@
 import DownloadIcon from '../assets/download-icon.svg'
+import GreenCircleIcon from '../assets/green-circle.svg'
 
 type IconProps = {
     token: string,
@@ -14,6 +15,10 @@ export default function Icon({
     let tokenSrc = DownloadIcon
     if (token === 'download') {
         tokenSrc = DownloadIcon
+    }
+
+    if (token === 'green-circle') {
+        tokenSrc = GreenCircleIcon
     }
 
     return (
